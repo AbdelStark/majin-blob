@@ -9,6 +9,9 @@ z = 3903325484781821239528670643512874685715965916413925054878141157034022583578
 BLOB_LEN = 4096
 
 def div_mod(a, b, P):
+    # if b is > a, then print a and b
+    if a < b:
+        print(a, b)
     return (a * pow(b, P - 2, P)) % P
 
 def ifft(arr, xs):
@@ -36,4 +39,4 @@ with open('./examples/blob/sn_blob_goerli.txt', 'r') as file:
 data = [int(blob_hex[i:i+64], 16) for i in range(0, BLOB_LEN * 64, 64)]
 xs = [pow(z, int(bin(i)[2:].rjust(12, '0')[::-1], 2), P) for i in range(BLOB_LEN)]
 res = ifft(data, xs)
-print(res)
+#print(res)

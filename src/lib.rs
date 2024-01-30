@@ -58,7 +58,7 @@ pub fn blob_recover(data: Vec<BigUint>) -> Vec<BigUint> {
 /// # Returns
 ///
 /// The result of the division modulo `p` as a `BigUint`.
-fn div_mod(a: BigUint, b: BigUint, p: &BigUint) -> BigUint {
+pub fn div_mod(a: BigUint, b: BigUint, p: &BigUint) -> BigUint {
     a * mod_inv(b, p) % p
 }
 
@@ -76,7 +76,7 @@ fn div_mod(a: BigUint, b: BigUint, p: &BigUint) -> BigUint {
 /// # Panics
 ///
 /// Panics if the modulus is less than or equal to 2.
-fn mod_inv(value: BigUint, modulus: &BigUint) -> BigUint {
+pub fn mod_inv(value: BigUint, modulus: &BigUint) -> BigUint {
     let two = 2u32.to_biguint().unwrap();
     if modulus > &two {
         value.modpow(&(modulus - &two), modulus)
@@ -96,7 +96,7 @@ fn mod_inv(value: BigUint, modulus: &BigUint) -> BigUint {
 /// # Returns
 ///
 /// A vector of `BigUint` representing the transformed array.
-fn ifft(arr: Vec<BigUint>, xs: Vec<BigUint>, p: &BigUint) -> Vec<BigUint> {
+pub fn ifft(arr: Vec<BigUint>, xs: Vec<BigUint>, p: &BigUint) -> Vec<BigUint> {
     // Base case: return immediately if the array length is 1
     if arr.len() == 1 {
         return arr;
@@ -113,11 +113,11 @@ fn ifft(arr: Vec<BigUint>, xs: Vec<BigUint>, p: &BigUint) -> Vec<BigUint> {
         let x = &xs[i / 2];
 
         res0.push(div_mod(a + b, 2u32.to_biguint().unwrap(), p));
-
+        //res1.push(div_mod(a - b, 2u32.to_biguint().unwrap() * x, p));
         // Handle subtraction to avoid underflow
         let diff = if b > a { p - (b - a) } else { a - b };
-
         res1.push(div_mod(diff, 2u32.to_biguint().unwrap() * x, p));
+
         new_xs.push(x.modpow(&2u32.to_biguint().unwrap(), p));
     }
 
