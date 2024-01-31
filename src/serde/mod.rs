@@ -1,5 +1,6 @@
+use bitvec::{order::Lsb0, vec::BitVec};
 use num_bigint::BigUint;
-use num_traits::ToPrimitive;
+use num_traits::{One, ToPrimitive};
 use serde::{Deserialize, Serialize};
 use serde_json;
 
@@ -7,7 +8,7 @@ use serde_json;
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ContractUpdate {
     address: BigUint,
-    class_info_flag: u8,
+    class_info_flag: BigUint,
     nonce: u64,
     number_of_storage_updates: u64,
     new_class_hash: Option<BigUint>, // Present only if class_info_flag is 1
@@ -34,22 +35,40 @@ pub struct ClassDeclaration {
 pub fn parse_state_diffs(data: &[BigUint]) -> Vec<ContractUpdate> {
     let mut updates = Vec::new();
     let mut i = 0;
+    let contract_updated_num = data[i].to_usize().unwrap();
+    i += 1;
 
-    while i < data.len() {
+    for _ in 0..contract_updated_num {
         let address = data[i].clone();
+        println!("address: {}", address);
         i += 1;
         let info_word = &data[i];
+        println!("info_word: {}", info_word);
         i += 1;
+        //let class_info_flag = info_word >> 63_u32;
 
-        let class_info_flag = (info_word >> 63_u32).to_u8().unwrap();
-        let nonce = ((info_word >> 64_u32) & BigUint::from(0xFFFFFFFFFFFFFFFF_u64))
-            .to_u64()
-            .unwrap(); // Convert to u64
-        let number_of_storage_updates = (info_word & BigUint::from(0xFFFFFFFFFFFFFFFF_u64))
-            .to_u64()
-            .unwrap(); // Convert to u64
+        let class_info_flag_bits: BitVec<_, Lsb0> = BitVec::from_vec(info_word.to_bytes_be());
+        println!("class_info_flag_bits: {:?}", class_info_flag_bits.len());
+        println!("{}", class_info_flag_bits);
 
-        let new_class_hash = if class_info_flag == 1 {
+        // Extract class info flag (last bit)
+        //let class_info_flag = (info_word & BigUint::one()).to_u8().unwrap();
+        // Extract nonce (next 64 bits)
+        // let nonce = (info_word >> BigUint::one() & BigUint::from(0xFFFFFFFFFFFFFFFF_u64))
+        //     .to_u64()
+        //     .unwrap();
+        // Extract number of storage updates (next 64 bits)
+        // let number_of_storage_updates = (info_word >> 65 & BigUint::from(0xFFFFFFFFFFFFFFFF_u64))
+        //     .to_u64()
+        //     .unwrap();
+        let class_info_flag = BigUint::one();
+        let nonce = 1_u64;
+        let number_of_storage_updates = 1_u64;
+        println!("class_info_flag: {}", class_info_flag);
+        println!("nonce: {}", nonce);
+        println!("number_of_storage_updates: {}", number_of_storage_updates);
+
+        let new_class_hash = if class_info_flag == BigUint::one() {
             i += 1;
             Some(data[i].clone())
         } else {

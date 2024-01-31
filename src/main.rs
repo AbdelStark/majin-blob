@@ -10,10 +10,10 @@ fn main() {
     // Recover the original data
     let original_data = blob_recover(blob_data);
 
-    println!("Original data: {:?}", original_data);
+    //println!("Original data: {:?}", original_data);
 
     // Parse the original data into state diffs
-    //let state_diffs = sbw::serde::parse_state_diffs(original_data.as_slice());
+    let state_diffs = sbw::serde::parse_state_diffs(original_data.as_slice());
 
     // Serialize the state diffs into JSON
     //let state_diffs_json = sbw::serde::to_json(state_diffs.as_slice());
