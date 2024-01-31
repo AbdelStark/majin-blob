@@ -1,28 +1,7 @@
-use lazy_static::lazy_static;
-use num_bigint::{BigUint, ToBigUint};
+use num_bigint::BigUint;
 use num_traits::Num;
-use std::str::FromStr;
 
-// ****************************************************************************
-// *  PARAMETERS & CONSTANTS                                                  *
-// ****************************************************************************
-/// Length of the blob.
-pub const BLOB_LEN: usize = 4096;
-lazy_static! {
-    /// EIP-4844 BLS12-381 modulus.
-    ///
-    /// As defined in https://eips.ethereum.org/EIPS/eip-4844
-    static ref EIP_4844_BLS_MODULUS: BigUint = BigUint::from_str(
-        "52435875175126190479447740508185965837690552500527637822603658699938581184513",
-    )
-    .unwrap();
-    /// Generator of the group of evaluation points (EIP-4844 parameter).
-    static ref GENERATOR: BigUint = BigUint::from_str(
-        "39033254847818212395286706435128746857159659164139250548781411570340225835782",
-    )
-    .unwrap();
-    static ref TWO: BigUint = 2u32.to_biguint().unwrap();
-}
+use crate::eip4844_params::{BLOB_LEN, EIP_4844_BLS_MODULUS, GENERATOR, TWO};
 
 /// Recovers the original data from a given blob.
 ///
@@ -36,7 +15,7 @@ lazy_static! {
 /// # Returns
 ///
 /// A vector of `BigUint` representing the recovered original data.
-pub fn blob_recover(data: Vec<BigUint>) -> Vec<BigUint> {
+pub fn recover(data: Vec<BigUint>) -> Vec<BigUint> {
     let xs: Vec<BigUint> = (0..BLOB_LEN)
         .map(|i| {
             let bin = format!("{:012b}", i);

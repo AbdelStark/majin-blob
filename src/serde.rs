@@ -1,6 +1,9 @@
+use std::fs;
+
+use crate::eip4844_params::BLOB_LEN;
 use bitvec::{order::Lsb0, vec::BitVec};
 use num_bigint::BigUint;
-use num_traits::{One, ToPrimitive};
+use num_traits::{Num, One, ToPrimitive};
 use serde::{Deserialize, Serialize};
 use serde_json;
 
@@ -104,4 +107,26 @@ pub fn parse_state_diffs(data: &[BigUint]) -> Vec<ContractUpdate> {
 /// A JSON string.
 pub fn to_json(state_diffs: &[ContractUpdate]) -> String {
     serde_json::to_string_pretty(&state_diffs).unwrap()
+}
+
+/// Read a file and return a vector of `BigUint` representing the data.
+/// # Arguments
+/// * `file_path` - The path to the file.
+/// # Returns
+/// A vector of `BigUint` representing the data.
+pub fn parse_file_to_blob_data(file_path: &str) -> Vec<BigUint> {
+    let blob_hex = fs::read_to_string(file_path).expect("Failed to read file");
+    parse_str_to_blob_data(blob_hex.as_str())
+}
+
+/// Parse a string and return a vector of `BigUint` representing the data.
+/// # Arguments
+/// * `data` - The string to parse.
+/// # Returns
+/// A vector of `BigUint` representing the data.
+pub fn parse_str_to_blob_data(data: &str) -> Vec<BigUint> {
+    let blob_hex = data.trim();
+    (0..BLOB_LEN)
+        .map(|i| BigUint::from_str_radix(&blob_hex[i * 64..(i + 1) * 64], 16).unwrap())
+        .collect()
 }
