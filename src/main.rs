@@ -6,8 +6,6 @@ fn main() {
     // Recover the original data
     let original_data = majin_blob::blob::recover(blob_data);
 
-    println!("Original data: {:?}", original_data);
-
     // Parse the original data into state diffs
     let state_diffs = majin_blob::serde::parse_state_diffs(original_data.as_slice());
 
