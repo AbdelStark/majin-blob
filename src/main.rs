@@ -9,10 +9,10 @@ fn main() {
     println!("Original data: {:?}", original_data);
 
     // Parse the original data into state diffs
-    let _state_diffs = majin_blob::serde::parse_state_diffs(original_data.as_slice());
+    let state_diffs = majin_blob::serde::parse_state_diffs(original_data.as_slice());
 
     // Serialize the state diffs into JSON
-    //let state_diffs_json = sbw::serde::to_json(state_diffs.as_slice());
+    let state_diffs_json = majin_blob::serde::to_json(state_diffs.as_slice());
 
-    //println!("{}", state_diffs_json);
+    println!("{}", state_diffs_json);
 }

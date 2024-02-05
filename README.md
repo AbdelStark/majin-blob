@@ -1,7 +1,5 @@
 <div align="center">
-  <img src="docs/logos/majin-blob.png" height="300"/>
-  <h1>Majin Blob</h1>
-  <h2>The demoniac blob</h2>
+  <img src="docs/logo/logo - gradient bg.png" height="300"/>
 </div>
 
 ## Overview
@@ -25,10 +23,11 @@ fn main() {
     let state_diffs = majin_blob::serde::parse_state_diffs(original_data.as_slice());
 
     // Serialize the state diffs into JSON
-    let state_diffs_json = sbw::serde::to_json(state_diffs.as_slice());
+    let state_diffs_json = majin_blob::serde::to_json(state_diffs.as_slice());
 
     println!("{}", state_diffs_json);
 }
+
 ```
 
 ## License

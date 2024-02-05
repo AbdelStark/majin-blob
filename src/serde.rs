@@ -1,33 +1,59 @@
 use std::fs;
 
 use crate::eip4844_params::BLOB_LEN;
-use bitvec::{order::Lsb0, vec::BitVec};
 use num_bigint::BigUint;
 use num_traits::{Num, One, ToPrimitive};
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize, Serializer};
 use serde_json;
 
 // Define the data structures
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ContractUpdate {
+    #[serde(serialize_with = "serialize_biguint")]
     address: BigUint,
-    class_info_flag: BigUint,
     nonce: u64,
     number_of_storage_updates: u64,
+    #[serde(serialize_with = "serialize_option_biguint")]
     new_class_hash: Option<BigUint>, // Present only if class_info_flag is 1
     storage_updates: Vec<StorageUpdate>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct StorageUpdate {
+    #[serde(serialize_with = "serialize_biguint")]
     key: BigUint,
+    #[serde(serialize_with = "serialize_biguint")]
     value: BigUint,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ClassDeclaration {
+    #[serde(serialize_with = "serialize_biguint")]
     class_hash: BigUint,
+    #[serde(serialize_with = "serialize_biguint")]
     compiled_class_hash: BigUint,
+}
+
+// Custom serializer for BigUint
+fn serialize_biguint<S>(biguint: &BigUint, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    serializer.serialize_str(&biguint.to_str_radix(10))
+}
+
+// Custom serializer for Option<BigUint>
+fn serialize_option_biguint<S>(
+    option_biguint: &Option<BigUint>,
+    serializer: S,
+) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    match option_biguint {
+        Some(value) => serialize_biguint(value, serializer),
+        None => serializer.serialize_none(),
+    }
 }
 
 /// Function to parse the encoded data into a vector of StateDiff structs.
@@ -43,34 +69,11 @@ pub fn parse_state_diffs(data: &[BigUint]) -> Vec<ContractUpdate> {
 
     for _ in 0..contract_updated_num {
         let address = data[i].clone();
-        println!("address: {}", address);
         i += 1;
         let info_word = &data[i];
-        println!("info_word: {}", info_word);
         i += 1;
-        //let class_info_flag = info_word >> 63_u32;
 
-        let class_info_flag_bits: BitVec<_, Lsb0> = BitVec::from_vec(info_word.to_bytes_be());
-        println!("class_info_flag_bits: {:?}", class_info_flag_bits.len());
-        println!("{}", class_info_flag_bits);
-
-        // Extract class info flag (last bit)
-        //let class_info_flag = (info_word & BigUint::one()).to_u8().unwrap();
-        // Extract nonce (next 64 bits)
-        // let nonce = (info_word >> BigUint::one() & BigUint::from(0xFFFFFFFFFFFFFFFF_u64))
-        //     .to_u64()
-        //     .unwrap();
-        // Extract number of storage updates (next 64 bits)
-        // let number_of_storage_updates = (info_word >> 65 & BigUint::from(0xFFFFFFFFFFFFFFFF_u64))
-        //     .to_u64()
-        //     .unwrap();
-        let class_info_flag = BigUint::one();
-        let nonce = 1_u64;
-        let number_of_storage_updates = 1_u64;
-        println!("class_info_flag: {}", class_info_flag);
-        println!("nonce: {}", nonce);
-        println!("number_of_storage_updates: {}", number_of_storage_updates);
-
+        let class_info_flag = extract_bits(&info_word, 0, 1);
         let new_class_hash = if class_info_flag == BigUint::one() {
             i += 1;
             Some(data[i].clone())
@@ -78,18 +81,22 @@ pub fn parse_state_diffs(data: &[BigUint]) -> Vec<ContractUpdate> {
             None
         };
 
+        // Nonce are the next 64 bits
+        let nonce = extract_bits(&info_word, 1, 65).to_u64().unwrap();
+        // Number of storage updates are the next 64 bits
+        let number_of_storage_updates = extract_bits(&info_word, 66, 129).to_u64().unwrap();
+
         let mut storage_updates = Vec::new();
         for _ in 0..number_of_storage_updates {
-            i += 1;
             let key = data[i].clone();
             i += 1;
             let value = data[i].clone();
+            i += 1;
             storage_updates.push(StorageUpdate { key, value });
         }
 
         updates.push(ContractUpdate {
             address,
-            class_info_flag,
             nonce,
             number_of_storage_updates,
             new_class_hash,
@@ -129,4 +136,17 @@ pub fn parse_str_to_blob_data(data: &str) -> Vec<BigUint> {
     (0..BLOB_LEN)
         .map(|i| BigUint::from_str_radix(&blob_hex[i * 64..(i + 1) * 64], 16).unwrap())
         .collect()
+}
+
+/// Function to extract bits from a `BigUint` and return a new `BigUint`.
+/// # Arguments
+/// * `word` - The `BigUint` to extract bits from.
+/// * `start` - The start index of the bits to extract.
+/// * `end` - The end index of the bits to extract.
+/// # Returns
+/// A new `BigUint` representing the extracted bits.
+fn extract_bits(word: &BigUint, start: usize, end: usize) -> BigUint {
+    let bit_string = format!("{:#b}", word).replace("0b", "");
+    let bit_string = bit_string[start..end].parse::<String>().unwrap();
+    BigUint::from_str_radix(&bit_string, 2).unwrap()
 }
