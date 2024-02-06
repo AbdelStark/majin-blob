@@ -1,6 +1,12 @@
 [workspace]
 resolver = "2"
-members = ["crates/core", "crates/types", "crates/eip4844", "crates/cli"]
+members = [
+    "crates/core",
+    "crates/types",
+    "crates/eip4844",
+    "crates/cli",
+    "crates/wasm",
+]
 
 [workspace.package]
 authors = ["Abdelhamid Bakhta <@AbdelStark>"]
