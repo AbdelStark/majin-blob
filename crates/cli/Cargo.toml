@@ -1,0 +1,22 @@
+[package]
+name = "majin-blob"
+description = "Command line tool to play with Starknet blobs."
+license = "MIT"
+version = "0.1.1"
+edition = "2021"
+
+[dependencies]
+
+# Internal dependencies
+majin-blob-core = { workspace = true }
+majin-blob-types = { workspace = true }
+
+# 3rd party dependencies
+lazy_static = { workspace = true, default-features = false }
+num-bigint = { workspace = true, default-features = false, features = [
+    "serde",
+] }
+num-traits = { workspace = true, default-features = false }
+serde_json = { workspace = true, default-features = false }
+serde = { workspace = true, default-features = false, features = ["derive"] }
+clap = { version = "4.4.18", features = ["derive"] }

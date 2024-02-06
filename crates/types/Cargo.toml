@@ -1,0 +1,17 @@
+[package]
+name = "majin-blob-types"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+
+# Internal dependencies
+majin-blob-eip-4844 = { workspace = true }
+
+# 3rd party dependencies
+num-bigint = { workspace = true, default-features = false, features = [
+    "serde",
+] }
+num-traits = { workspace = true, default-features = false }
+serde_json = { workspace = true, default-features = false }
+serde = { workspace = true, default-features = false, features = ["derive"] }

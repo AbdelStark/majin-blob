@@ -1,13 +1,37 @@
-[package]
-name = "majin-blob"
-description = "A minimalistic Rust library for working with Starknet blobs."
-license = "MIT"
-version = "0.1.0"
-edition = "2021"
+[workspace]
+resolver = "2"
+members = ["crates/core", "crates/types", "crates/eip4844", "crates/cli"]
 
-[dependencies]
-lazy_static = "1.4.0"
-num-bigint = { version = "0.4.0", features = ["serde"] }
-num-traits = "0.2"
-serde_json = "1.0.113"
-serde = { version = "1.0.196", features = ["derive"] }
+[workspace.package]
+authors = ["Abdelhamid Bakhta <@AbdelStark>"]
+edition = "2021"
+repository = "https://github.com/AbdelStark/majin-blob"
+version = "0.1.0"
+
+[profile.release]
+panic = "unwind"
+
+[profile.production]
+inherits = "release"
+codegen-units = 1    # Setting this to 1 allows for more optimizations at the cost of slower compile time
+lto = true           # Enables Link Time Optimization, enabling more aggressive optimizations across the entire codebase
+opt-level = 3        # Optimize for speed regardless of binary size or compile time
+rpath = false        # Disables adding rpath to the binary
+
+[workspace.dependencies]
+
+# Internal dependencies
+majin-blob-core = { path = "crates/core" }
+majin-blob-types = { path = "crates/types" }
+majin-blob-eip-4844 = { path = "crates/eip4844" }
+
+# 3rd party dependencies
+lazy_static = { version = "1.4.0", default-features = false }
+num-bigint = { version = "0.4.0", default-features = false, features = [
+    "serde",
+] }
+num-traits = { version = "0.2", default-features = false }
+serde_json = { version = "1.0.113", default-features = false, features = [
+    "alloc",
+] }
+serde = { version = "1.0.196", default-features = false, features = ["derive"] }

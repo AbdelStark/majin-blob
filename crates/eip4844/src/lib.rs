@@ -11,7 +11,7 @@ lazy_static! {
     /// EIP-4844 BLS12-381 modulus.
     ///
     /// As defined in https://eips.ethereum.org/EIPS/eip-4844
-    pub static ref EIP_4844_BLS_MODULUS: BigUint = BigUint::from_str(
+    pub static ref BLS_MODULUS: BigUint = BigUint::from_str(
         "52435875175126190479447740508185965837690552500527637822603658699938581184513",
     )
     .unwrap();
