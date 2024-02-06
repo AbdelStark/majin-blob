@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Majin Blob WASM</title>
+  </head>
+  <body>
+    <noscript
+      >This page contains webassembly and javascript content, please enable
+      javascript in your browser.</noscript
+    >
+    <script src="./bootstrap.js"></script>
+    <form id="blobForm">
+      <input type="file" id="blobFileInput" />
+      <textarea
+        id="blobTextInput"
+        placeholder="Or enter blob data here"
+      ></textarea>
+      <button type="submit">Recover</button>
+    </form>
+
+    <pre id="stateDiffsOutput"></pre>
+  </body>
+</html>
