@@ -1,0 +1,29 @@
+name: wasm-webapp
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v4
+
+      # Build step with working directory set to ./crates/wasm/app
+      - name: Build
+        run: npm run build
+        working-directory: ./crates/wasm/app
+
+      # Deploy step
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./crates/wasm/app/dist
