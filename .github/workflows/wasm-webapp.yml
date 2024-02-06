@@ -22,8 +22,9 @@ jobs:
         working-directory: ./crates/wasm/app
 
       # Build step with working directory set to ./crates/wasm/app
+      # NODE_OPTIONS=--openssl-legacy-provider is required for the build step to work
       - name: Build
-        run: npm run build
+        run: NODE_OPTIONS=--openssl-legacy-provider npm run build
         working-directory: ./crates/wasm/app
 
       # Deploy step
