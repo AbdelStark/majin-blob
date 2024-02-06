@@ -145,6 +145,7 @@ pub fn parse_str_to_blob_data(data: &str) -> Vec<BigUint> {
 /// * `end` - The end index of the bits to extract.
 /// # Returns
 /// A new `BigUint` representing the extracted bits.
+/// @TODO: Implement a more efficient way to extract bits.
 fn extract_bits(word: &BigUint, start: usize, end: usize) -> BigUint {
     let bit_string = format!("{:#b}", word).replace("0b", "");
     let bit_string = bit_string[start..end].parse::<String>().unwrap();
