@@ -21,9 +21,9 @@ rpath = false        # Disables adding rpath to the binary
 [workspace.dependencies]
 
 # Internal dependencies
-majin-blob-core = { path = "crates/core" }
-majin-blob-types = { path = "crates/types" }
-majin-blob-eip-4844 = { path = "crates/eip4844" }
+majin-blob-core = { version = "0.1.0", path = "crates/core" }
+majin-blob-types = { version = "0.1.1", path = "crates/types" }
+majin-blob-eip-4844 = { version = "0.1.1", path = "crates/eip4844" }
 
 # 3rd party dependencies
 lazy_static = { version = "1.4.0", default-features = false }

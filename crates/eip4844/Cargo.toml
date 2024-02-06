@@ -1,6 +1,9 @@
 [package]
 name = "majin-blob-eip-4844"
-version = "0.1.0"
+description = "EIP-4844 parameters for Majin Blob."
+repository = "https://github.com/AbdelStark/majin-blob"
+license = "MIT"
+version = "0.1.1"
 edition = "2021"
 
 [dependencies]
