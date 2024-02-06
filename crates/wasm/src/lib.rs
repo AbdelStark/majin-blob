@@ -5,11 +5,6 @@ use majin_blob_types::serde::{parse_state_diffs, parse_str_to_blob_data, to_json
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
-extern "C" {
-    fn alert(s: &str);
-}
-
-#[wasm_bindgen]
 pub fn blob_recover(data: &str) -> String {
     let blob_data = parse_str_to_blob_data(data);
     let original_data = recover(blob_data);
