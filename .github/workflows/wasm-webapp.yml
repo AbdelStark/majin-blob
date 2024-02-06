@@ -16,6 +16,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Install dependencies
+      - name: Install Dependencies
+        run: npm install
+        working-directory: ./crates/wasm/app
+
       # Build step with working directory set to ./crates/wasm/app
       - name: Build
         run: npm run build
