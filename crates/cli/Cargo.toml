@@ -1,6 +1,7 @@
 [package]
 name = "majin-blob"
 description = "Command line tool to play with Starknet blobs."
+repository = "https://github.com/AbdelStark/majin-blob"
 license = "MIT"
 version = "0.1.1"
 edition = "2021"
