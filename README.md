@@ -22,7 +22,7 @@ cargo install majin-blob
 
 ```sh
 # Recover the original data from a blob file
-majin-blob recover ./examples/blob/sn_blob_goerli.txt
+majin-blob recover --blob-file ./examples/blob/sn_blob_goerli.txt
 ```
 
 #### Help
