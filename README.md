@@ -64,6 +64,22 @@ fn main() {
 }
 ```
 
+### Use the REST API
+
+You can use the REST API to recover the original data from a blob file and parse it into state diffs.
+
+#### Start the REST API
+
+```sh
+cargo run --release -p majin-blob-rest-api
+```
+
+#### Recover the original data from a blob file
+
+```sh
+curl -X POST --data-binary "@./examples/blob/sn_blob_goerli.txt" http://127.0.0.1:3030/blob
+```
+
 ## License
 
 This project is licensed under the [MIT license](LICENSE).

@@ -6,6 +6,7 @@ members = [
     "crates/eip4844",
     "crates/cli",
     "crates/wasm",
+    "crates/rest-api",
 ]
 
 [workspace.package]
