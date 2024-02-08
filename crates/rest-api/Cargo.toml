@@ -1,0 +1,25 @@
+[package]
+name = "majin-blob-rest-api"
+description = "REST API to play with Starknet blobs."
+repository = "https://github.com/AbdelStark/majin-blob"
+readme = "../../README.md"
+license = "MIT"
+version = "0.1.2"
+edition = "2021"
+
+[dependencies]
+
+# Internal dependencies
+majin-blob-core = { workspace = true }
+majin-blob-types = { workspace = true }
+
+# 3rd party dependencies
+num-bigint = { workspace = true, default-features = false, features = [
+    "serde",
+] }
+num-traits = { workspace = true, default-features = false }
+serde_json = { workspace = true, default-features = false }
+serde = { workspace = true, default-features = false, features = ["derive"] }
+warp = "0.3.6"
+tokio = { version = "1", features = ["full"] }
+pretty_env_logger = "0.5.0"
