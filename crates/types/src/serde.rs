@@ -16,7 +16,6 @@ pub fn parse_state_diffs(data: &[BigUint]) -> Vec<ContractUpdate> {
     let mut i = 0;
     let contract_updated_num = data[i].to_usize().unwrap();
     i += 1;
-    println!("contract_updated_num {}", contract_updated_num);
 
     for _ in 0..contract_updated_num {
         let address = data[i].clone();
@@ -119,7 +118,6 @@ pub fn parse_str_to_blob_data(data: &str) -> Vec<BigUint> {
 // Verify bits len and more
 fn extract_bits(word: &BigUint, start: usize, end: usize) -> BigUint {
     let string = format!("{:#b}", word).replace("0b", "");
-    println!("extract_bits word {} start {} and end {}", word, start, end);
     // TODO add check before  call extract_bits?
     if string.len() < end {
         let bit_string: String = format!("{:#b}", word).replace("0b", "");
