@@ -20,12 +20,12 @@ pub fn parse_state_diffs(data: &[BigUint]) -> Vec<ContractUpdate> {
     for _ in 0..contract_updated_num {
         let address = data[i].clone();
         // Break if address undefined
-        if address == BigUint::zero()  {
+        if address == BigUint::zero() {
             break;
         }
         i += 1;
         // Break after blob data len
-        if i >= BLOB_LEN -1 {
+        if i >= BLOB_LEN - 1 {
             break;
         }
         let info_word = &data[i];
@@ -50,7 +50,7 @@ pub fn parse_state_diffs(data: &[BigUint]) -> Vec<ContractUpdate> {
         let mut storage_updates = Vec::new();
         for _ in 0..number_of_storage_updates {
             // Break after blob data len
-            if i >= BLOB_LEN - 1{
+            if i >= BLOB_LEN - 1 {
                 break;
             }
             let key = data[i].clone();
@@ -58,7 +58,7 @@ pub fn parse_state_diffs(data: &[BigUint]) -> Vec<ContractUpdate> {
             let value = data[i].clone();
             i += 1;
             // TODO verify key/value if null or 0
-            if key == BigUint::zero()  && value == BigUint::zero() {
+            if key == BigUint::zero() && value == BigUint::zero() {
                 break;
             }
             storage_updates.push(StorageUpdate { key, value });
@@ -114,7 +114,7 @@ pub fn parse_str_to_blob_data(data: &str) -> Vec<BigUint> {
 /// * `end` - The end index of the bits to extract.
 /// # Returns
 /// A new `BigUint` representing the extracted bits.
-/// @TODO: Implement a more efficient way to extract bits. 
+/// @TODO: Implement a more efficient way to extract bits.
 // Verify bits len and more
 fn extract_bits(word: &BigUint, start: usize, end: usize) -> BigUint {
     let string = format!("{:#b}", word).replace("0b", "");
@@ -123,26 +123,12 @@ fn extract_bits(word: &BigUint, start: usize, end: usize) -> BigUint {
         let bit_string: String = format!("{:#b}", word).replace("0b", "");
         // 0 index and end max
         let bit_string = bit_string[0..string.len()].parse::<String>().unwrap();
-        let bits= BigUint::from_str_radix(&bit_string, 2).unwrap_or_default();
+        let bits = BigUint::from_str_radix(&bit_string, 2).unwrap_or_default();
         bits
     } else {
         let bit_string: String = format!("{:#b}", word).replace("0b", "");
         let bit_string = bit_string[start..end].parse::<String>().unwrap_or_default();
-        let bits= BigUint::from_str_radix(&bit_string, 2).unwrap_or_default();
+        let bits = BigUint::from_str_radix(&bit_string, 2).unwrap_or_default();
         bits
     }
-}
-
-/// Function to extract bits from a `BigUint` and return a new `BigUint`.
-/// # Arguments
-/// * `word` - The `BigUint` to extract bits from.
-/// * `start` - The start index of the bits to extract.
-/// * `end` - The end index of the bits to extract.
-/// # Returns
-/// A new `BigUint` representing the extracted bits.
-/// @TODO: Implement a more efficient way to extract bits.
-fn old_extract_bits(word: &BigUint, start: usize, end: usize) -> BigUint {
-    let bit_string = format!("{:#b}", word).replace("0b", "");
-    let bit_string = bit_string[start..end].parse::<String>().unwrap();
-    BigUint::from_str_radix(&bit_string, 2).unwrap()
 }

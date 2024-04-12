@@ -3,7 +3,7 @@ name = "majin-blob-core"
 description = "A minimalistic Rust library for working with Starknet blobs."
 repository = "https://github.com/AbdelStark/majin-blob"
 license = "MIT"
-version = "0.1.1"
+version = "0.1.3"
 edition = "2021"
 
 [dependencies]

@@ -1,6 +1,10 @@
 [package]
 name = "majin-blob-wasm"
-version = "0.1.0"
+description = "Majin Blob wasm bindings"
+repository = "https://github.com/AbdelStark/majin-blob"
+readme = "../../README.md"
+license = "MIT"
+version = "0.1.3"
 authors = ["Abdelhamid Bakhta <@AbdelStark>"]
 edition = "2018"
 
