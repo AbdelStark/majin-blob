@@ -21,3 +21,6 @@ Cargo.lock
 
 # .DS_Store files are created by Mac OS X
 .DS_Store
+
+# Jet brains IDE files
+.idea
