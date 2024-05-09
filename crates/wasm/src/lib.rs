@@ -9,6 +9,6 @@ pub fn blob_recover(data: &str) -> String {
     let blob_data = parse_str_to_blob_data(data);
     let original_data = recover(blob_data);
     let state_diffs = parse_state_diffs(&original_data);
-    let state_diffs_json = to_json(state_diffs.as_slice());
+    let state_diffs_json = to_json(state_diffs);
     state_diffs_json
 }

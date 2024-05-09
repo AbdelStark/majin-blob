@@ -1,6 +1,6 @@
 use std::fs;
 
-use crate::state_diffs::{ContractUpdate, StorageUpdate};
+use crate::state_diffs::{ClassDeclaration, ContractUpdate, DataJson, StorageUpdate};
 use majin_blob_eip_4844::BLOB_LEN;
 use num_bigint::BigUint;
 use num_traits::{Num, One, ToPrimitive, Zero};
@@ -11,13 +11,13 @@ use serde_json;
 /// * `data` - A vector of `BigUint` representing the encoded data.
 /// # Returns
 /// A vector of `ContractUpdate` structs.
-pub fn parse_state_diffs(data: &[BigUint]) -> Vec<ContractUpdate> {
+pub fn parse_state_diffs(data: &[BigUint]) -> DataJson {
     let mut updates = Vec::new();
     let mut i = 0;
     let contract_updated_num = data[i].to_usize().unwrap();
-    i += 1;
+    i += 5;
 
-    for _ in 0..contract_updated_num {
+    for _ in 0..contract_updated_num - 1 {
         let address = data[i].clone();
         // Break if address undefined
         if address == BigUint::zero() {
@@ -31,9 +31,11 @@ pub fn parse_state_diffs(data: &[BigUint]) -> Vec<ContractUpdate> {
         let info_word = &data[i];
         i += 1;
 
+        let (class_flag, nonce, number_of_storage_updates) = extract_bits_v2(&info_word);
+
         // TODO verify info_word len
-        let class_info_flag = extract_bits(&info_word, 0, 1);
-        let new_class_hash = if class_info_flag == BigUint::one() {
+        // let class_info_flag = extract_bits(&info_word, 0, 1);
+        let new_class_hash = if class_flag {
             i += 1;
             Some(data[i].clone())
         } else {
@@ -42,10 +44,10 @@ pub fn parse_state_diffs(data: &[BigUint]) -> Vec<ContractUpdate> {
 
         // Nonce are the next 64 bits
         // TODO verify info_word len
-        let nonce = extract_bits(&info_word, 1, 65).to_u64().unwrap();
+        // let nonce = extract_bits(&info_word, 1, 65).to_u64().unwrap();
         // Number of storage updates are the next 64 bits
         // TODO verify info_word len
-        let number_of_storage_updates = extract_bits(&info_word, 66, 129).to_u64().unwrap();
+        // let number_of_storage_updates = extract_bits(&info_word, 66, 129).to_u64().unwrap();
 
         let mut storage_updates = Vec::new();
         for _ in 0..number_of_storage_updates {
@@ -73,7 +75,39 @@ pub fn parse_state_diffs(data: &[BigUint]) -> Vec<ContractUpdate> {
         });
     }
 
-    updates
+    let declared_classes_len = data[i].to_usize().unwrap();
+    let mut class_declaration_updates = Vec::new();
+    i += 1;
+    for _ in 0..declared_classes_len {
+        let class_hash = data[i].clone();
+        // Break if address undefined
+        if class_hash == BigUint::zero() {
+            println!("no class hash declared ser!!!");
+            break;
+        }
+        i += 1;
+        // Break after blob data len
+        if i >= BLOB_LEN - 1 {
+            println!("the loop ends here becayse of length ");
+            break;
+        }
+        let compiled_class_hash = data[i].clone();
+        i += 1;
+
+        class_declaration_updates.push(ClassDeclaration {
+            class_hash,
+            compiled_class_hash,
+        });
+    }
+
+    let final_result = DataJson {
+        state_update_size: (contract_updated_num - 1).to_u64().unwrap(),
+        state_update: updates,
+        class_declaration_size: declared_classes_len.to_u64().unwrap(),
+        class_declaration: class_declaration_updates,
+    };
+
+    final_result
 }
 
 /// Function to convert a vector of StateDiff structs into a JSON string.
@@ -81,7 +115,7 @@ pub fn parse_state_diffs(data: &[BigUint]) -> Vec<ContractUpdate> {
 /// * `state_diffs` - A vector of `StateDiff` structs.
 /// # Returns
 /// A JSON string.
-pub fn to_json(state_diffs: &[ContractUpdate]) -> String {
+pub fn to_json(state_diffs: DataJson) -> String {
     serde_json::to_string_pretty(&state_diffs).unwrap()
 }
 
@@ -131,4 +165,24 @@ fn extract_bits(word: &BigUint, start: usize, end: usize) -> BigUint {
         let bits = BigUint::from_str_radix(&bit_string, 2).unwrap_or_default();
         bits
     }
+}
+
+fn extract_bits_v2(info_word: &BigUint) -> (bool, u64, u64) {
+    let binary_string = format!("{:b}", info_word);
+    let bitstring = format!("{:0>256}", binary_string);
+    if bitstring.len() != 256 {
+        panic!("Input string must be 256 bits long");
+    }
+
+    let class_flag_bit = &bitstring[127..128];
+    let new_nonce_bits = &bitstring[128..192];
+    let num_changes_bits = &bitstring[192..256];
+
+    let class_flag = class_flag_bit == "1";
+    let new_nonce =
+        u64::from_str_radix(new_nonce_bits, 2).expect("Invalid binary string for new nonce");
+    let num_changes =
+        u64::from_str_radix(num_changes_bits, 2).expect("Invalid binary string for num changes");
+
+    (class_flag, new_nonce, num_changes)
 }

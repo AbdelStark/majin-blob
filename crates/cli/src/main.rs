@@ -29,20 +29,18 @@ fn main() {
         let blob_data = serde::parse_file_to_blob_data(blob_file.to_str().unwrap());
         let original_data = blob::recover(blob_data);
         let state_diffs = serde::parse_state_diffs(original_data.as_slice());
-        let state_diffs_json = serde::to_json(state_diffs.as_slice());
+        let state_diffs_json = serde::to_json(state_diffs);
         println!("state_diffs_json {}", state_diffs_json);
     }
 }
 
 #[test]
 fn test_cli_sn_goerli() {
-
-    let blob_data = serde::parse_file_to_blob_data( "../../examples/blob/sn_blob_goerli.txt");
+    let blob_data = serde::parse_file_to_blob_data("../../examples/blob/sn_blob_goerli.txt");
     let original_data = blob::recover(blob_data);
 
     let state_diffs = serde::parse_state_diffs(original_data.as_slice());
-    let state_diffs_json = serde::to_json(state_diffs.as_slice());
+    let state_diffs_json = serde::to_json(state_diffs);
     println!("{}", state_diffs_json);
     // TODO assert result of old version of sn_goerli
-
 }

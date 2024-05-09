@@ -1,6 +1,14 @@
 use num_bigint::BigUint;
 use serde::{Deserialize, Serialize, Serializer};
 
+#[derive(Serialize, Deserialize, Debug)]
+pub struct DataJson {
+    pub state_update_size: u64,
+    pub state_update: Vec<ContractUpdate>,
+    pub class_declaration_size: u64,
+    pub class_declaration: Vec<ClassDeclaration>,
+}
+
 // Define the data structures
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ContractUpdate {

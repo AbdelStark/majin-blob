@@ -37,7 +37,7 @@ pub mod handlers {
         let blob_data = serde::parse_str_to_blob_data(data.as_str());
         let original_data = blob::recover(blob_data);
         let state_diffs = serde::parse_state_diffs(original_data.as_slice());
-        let state_diffs_json = serde::to_json(state_diffs.as_slice());
+        let state_diffs_json = serde::to_json(state_diffs);
         Ok(state_diffs_json)
     }
 }
