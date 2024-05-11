@@ -3,20 +3,21 @@ use std::fs;
 use crate::state_diffs::{ClassDeclaration, ContractUpdate, DataJson, StorageUpdate};
 use majin_blob_eip_4844::BLOB_LEN;
 use num_bigint::BigUint;
-use num_traits::{Num, One, ToPrimitive, Zero};
+use num_traits::{Num, ToPrimitive, Zero};
 use serde_json;
 
 /// Function to parse the encoded data into a vector of StateDiff structs.
 /// # Arguments
 /// * `data` - A vector of `BigUint` representing the encoded data.
 /// # Returns
-/// A vector of `ContractUpdate` structs.
+/// A `DataJson` structs.
 pub fn parse_state_diffs(data: &[BigUint]) -> DataJson {
     let mut updates = Vec::new();
     let mut i = 0;
     let contract_updated_num = data[i].to_usize().unwrap();
     i += 5;
-
+    // iterate only on len-1 because (len-1)th element contains the length
+    // of declared classes.
     for _ in 0..contract_updated_num - 1 {
         let address = data[i].clone();
         // Break if address undefined
@@ -31,23 +32,14 @@ pub fn parse_state_diffs(data: &[BigUint]) -> DataJson {
         let info_word = &data[i];
         i += 1;
 
-        let (class_flag, nonce, number_of_storage_updates) = extract_bits_v2(&info_word);
+        let (class_flag, nonce, number_of_storage_updates) = extract_bits(&info_word);
 
-        // TODO verify info_word len
-        // let class_info_flag = extract_bits(&info_word, 0, 1);
         let new_class_hash = if class_flag {
             i += 1;
             Some(data[i].clone())
         } else {
             None
         };
-
-        // Nonce are the next 64 bits
-        // TODO verify info_word len
-        // let nonce = extract_bits(&info_word, 1, 65).to_u64().unwrap();
-        // Number of storage updates are the next 64 bits
-        // TODO verify info_word len
-        // let number_of_storage_updates = extract_bits(&info_word, 66, 129).to_u64().unwrap();
 
         let mut storage_updates = Vec::new();
         for _ in 0..number_of_storage_updates {
@@ -82,13 +74,11 @@ pub fn parse_state_diffs(data: &[BigUint]) -> DataJson {
         let class_hash = data[i].clone();
         // Break if address undefined
         if class_hash == BigUint::zero() {
-            println!("no class hash declared ser!!!");
             break;
         }
         i += 1;
         // Break after blob data len
         if i >= BLOB_LEN - 1 {
-            println!("the loop ends here becayse of length ");
             break;
         }
         let compiled_class_hash = data[i].clone();
@@ -141,43 +131,29 @@ pub fn parse_str_to_blob_data(data: &str) -> Vec<BigUint> {
         .collect()
 }
 
-/// Function to extract bits from a `BigUint` and return a new `BigUint`.
+/// Function to extract class flag, nonce and state_diff length from a `BigUint`.
 /// # Arguments
-/// * `word` - The `BigUint` to extract bits from.
-/// * `start` - The start index of the bits to extract.
-/// * `end` - The end index of the bits to extract.
+/// * `info_word` - The `BigUint` to extract bits from.
 /// # Returns
-/// A new `BigUint` representing the extracted bits.
-/// @TODO: Implement a more efficient way to extract bits.
-// Verify bits len and more
-fn extract_bits(word: &BigUint, start: usize, end: usize) -> BigUint {
-    let string = format!("{:#b}", word).replace("0b", "");
-    // TODO add check before  call extract_bits?
-    if string.len() < end {
-        let bit_string: String = format!("{:#b}", word).replace("0b", "");
-        // 0 index and end max
-        let bit_string = bit_string[0..string.len()].parse::<String>().unwrap();
-        let bits = BigUint::from_str_radix(&bit_string, 2).unwrap_or_default();
-        bits
-    } else {
-        let bit_string: String = format!("{:#b}", word).replace("0b", "");
-        let bit_string = bit_string[start..end].parse::<String>().unwrap_or_default();
-        let bits = BigUint::from_str_radix(&bit_string, 2).unwrap_or_default();
-        bits
-    }
-}
-
-fn extract_bits_v2(info_word: &BigUint) -> (bool, u64, u64) {
+/// A `bool` representing the class flag.
+/// A `u64` representing the nonce.
+/// Another`u64` representing the state_diff length
+fn extract_bits(info_word: &BigUint) -> (bool, u64, u64) {
+    // converting the bigUint to binary
     let binary_string = format!("{:b}", info_word);
+    // adding padding so that it can be of 256 length
     let bitstring = format!("{:0>256}", binary_string);
     if bitstring.len() != 256 {
         panic!("Input string must be 256 bits long");
     }
-
+    // getting the class flag, 127th bit is class flag (assuming 0 indexing)
     let class_flag_bit = &bitstring[127..128];
+    // getting the nonce, nonce is of 64 bit from 128th bit to 191st bit
     let new_nonce_bits = &bitstring[128..192];
+    // getting the state_diff_len, state_diff_len is of 64 bit from 192nd bit to 255th bit
     let num_changes_bits = &bitstring[192..256];
 
+    // converting data to respective type
     let class_flag = class_flag_bit == "1";
     let new_nonce =
         u64::from_str_radix(new_nonce_bits, 2).expect("Invalid binary string for new nonce");
