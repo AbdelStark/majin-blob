@@ -74,6 +74,7 @@ pub fn parse_state_diffs(data: &[BigUint]) -> DataJson {
         let class_hash = data[i].clone();
         // Break if address undefined
         if class_hash == BigUint::zero() {
+            panic!("class hash can't be zero when the len of declared_classes is non-zero");
             break;
         }
         i += 1;
