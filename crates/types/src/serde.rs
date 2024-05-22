@@ -167,6 +167,8 @@ fn extract_bits(info_word: &BigUint) -> (bool, u64, u64) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    
+    use std::fs;
     use num_bigint::BigUint;
     use std::{result, str::FromStr};
     use rstest::rstest;
@@ -319,5 +321,19 @@ mod tests {
     fn test_parse_str_to_blob_data(#[case] data: &str, #[case] expected_result: &Vec<BigUint>) {
         let result = parse_str_to_blob_data(data);
         assert_eq!(result, expected_result.clone());
+    }
+
+    #[rstest]
+    #[case("src/testutils/blob_ 640641.txt", "src/testutils/blob_ 640641_output.txt")]
+    #[case("src/testutils/blob_ 640644.txt", "src/testutils/blob_ 640644_output.txt")]
+    #[case("src/testutils/blob_ 640646.txt", "src/testutils/blob_ 640646_output.txt")]
+    #[case("src/testutils/blob_ 640647.txt", "src/testutils/blob_ 640647_output.txt")]
+    #[case("src/testutils/blob_ 639404.txt", "src/testutils/blob_ 639404_output.txt")]
+    fn test_parse_file_to_blob_data(#[case] file_path: &str, #[case] expected_output_file_path: &str) {
+        let result = parse_file_to_blob_data(file_path);
+        let expected_output: Vec<BigUint> = fs::read_to_string(expected_output_file_path).expect("Failed to read file").lines().into_iter()
+                                                .map(|s| BigUint::from_str(&s).expect("Failed to parse BigUint"))
+                                                .collect();
+        assert_eq!(result,expected_output);
     }
 } 
