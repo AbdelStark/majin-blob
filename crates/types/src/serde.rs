@@ -288,6 +288,34 @@ mod tests {
         ])
 
     )]
+    #[case(
+        &"00000000000000000000000000000001FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF".repeat(4096), 
+        &biguints_from_strings(&[
+            "680564733841876926926749214863536422911"; 4096
+        ])
+
+    )]
+    #[case(
+        &"0000000000000000000000000000000100000000000004D2000000000000270F".repeat(4096), 
+        &biguints_from_strings(&[
+            "340282366920938486226656794389354915599"; 4096
+        ])
+
+    )]
+    #[case(
+        &"0000000000000D99634EE36951FE43500B1805B3CF342D12FA160E18DAB27208".repeat(4096), 
+        &biguints_from_strings(&[
+            "21853026169818237947070859940682658839820493093261147223781896"; 4096
+        ])
+
+    )]
+    #[case(
+        &"341606E915B8FCA7D6908382709FF17BB8CEF91ADDDAF43467903D7A0F1759DC6D676B911577A1AA3E35042EFB29BA0F1A618ADB1273BE72A61A71604E895F83".repeat(4096/2), 
+        &biguints_from_strings(&[
+            "23559186456188288176746211509925988380451132083205062504931431952989141031388", "49484828141560354917085179895740570325324754012313231526408991898487008878467"
+        ].repeat(4096/2))
+
+    )]
     fn test_parse_str_to_blob_data(#[case] data: &str, #[case] expected_result: &Vec<BigUint>) {
         let result = parse_str_to_blob_data(data);
         assert_eq!(result, expected_result.clone());
