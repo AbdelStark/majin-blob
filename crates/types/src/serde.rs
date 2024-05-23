@@ -175,14 +175,14 @@ mod tests {
     use crate::state_diffs::{ClassDeclaration, ContractUpdate, DataJson, StorageUpdate};
 
     #[rstest]
-    #[case( "18446744073709551617",false, 1, 1)]
-    #[case("18446744073709551616",false, 1, 0)]
-    #[case("6",false, 0, 6)]
-    #[case("340282366920938463481821351505477763072", true, 1, 0)]
+    #[case("18446744073709551617",false, 1, 1)] // hex: 10000000000000001
+    #[case("18446744073709551616",false, 1, 0)] // hex: 10000000000000000
+    #[case("6",false, 0, 6)] 
+    #[case("340282366920938463481821351505477763072", true, 1, 0)] // hex: 100000000000000010000000000000000
     #[case("0", false, 0, 0)]
-    #[case("340282366920938463463374607431768211455", false, u64::MAX, u64::MAX)]
-    #[case("680564733841876926926749214863536422911", true, u64::MAX, u64::MAX)]
-    #[case("340282366920938486226656794389354915599", true, 1234, 9999)]
+    #[case("340282366920938463463374607431768211455", false, u64::MAX, u64::MAX)] // hex: FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+    #[case("680564733841876926926749214863536422911", true, u64::MAX, u64::MAX)] // hex: 1FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+    #[case("340282366920938486226656794389354915599", true, 1234, 9999)] // hex: 100000000000004D2000000000000270F
     fn test_extract_bits(
         #[case] info_word: BigUint,
         #[case] expected_class_flag: bool,
@@ -201,6 +201,7 @@ mod tests {
     } 
 
     #[rstest]
+    // Single Contract Update with One Class Declaration
     #[case( 
         &biguints_from_strings(&[
             "2", "1", "1", "1", "1", "1234", "1", "12", "34", "1", "56", "78"
@@ -211,6 +212,7 @@ mod tests {
             class_declaration: vec![ClassDeclaration {class_hash:BigUint::from(56u64),compiled_class_hash:BigUint::from(78u64)}]
         }
     )]
+    // Single Contract Update with One Storage Update and no 
     #[case( 
         &biguints_from_strings(&[
             "2", "1", "1", "1", "1", "1234", "1", "12", "34", "0"
@@ -221,7 +223,7 @@ mod tests {
             class_declaration: vec![]
         }
     )]
-
+    // Single Contract Update with New Class Hash and No Storage Updates
     #[case( 
         &biguints_from_strings(&[
             "2", "1", "1", "1", "1", "1234", "340282366920938463481821351505477763072", "5432", "0"
@@ -232,7 +234,7 @@ mod tests {
             class_declaration: vec![]
         }
     )]
-
+    // Single Contract Update with New Class Hash and One Storage Update
     #[case( 
         &biguints_from_strings(&[
             "2", "1", "1", "1", "1", "1234", "340282366920938568203987457954602287105", "5432", "12", "34", "0"
@@ -243,7 +245,7 @@ mod tests {
             class_declaration: vec![]
         }
     )]
-
+    // Single Contract Update with New Class Hash and Two Storage Updates
     #[case( 
         &biguints_from_strings(&[
             "2", "1", "1", "1", "1", "1234", "340282366920938568203987457954602287106", "5432", "12", "34", "56", "78", "0"
@@ -254,7 +256,7 @@ mod tests {
             class_declaration: vec![]
         }
     )]
-
+    // No Contract Updates or Class Declarations
     #[case( 
         &biguints_from_strings(&[
             "1", "1", "1", "1", "1", "0"
@@ -265,7 +267,7 @@ mod tests {
             class_declaration: vec![]
         }
     )]
-
+    // Multiple Class Declarations with No Contract Updates
     #[case( 
         &biguints_from_strings(&[
             "1", "1", "1", "1", "1", "2", "34","12", "23", "56"
@@ -324,11 +326,11 @@ mod tests {
     }
 
     #[rstest]
-    #[case("src/testutils/blob_ 640641.txt", "src/testutils/blob_ 640641_output.txt")]
-    #[case("src/testutils/blob_ 640644.txt", "src/testutils/blob_ 640644_output.txt")]
-    #[case("src/testutils/blob_ 640646.txt", "src/testutils/blob_ 640646_output.txt")]
-    #[case("src/testutils/blob_ 640647.txt", "src/testutils/blob_ 640647_output.txt")]
-    #[case("src/testutils/blob_ 639404.txt", "src/testutils/blob_ 639404_output.txt")]
+    #[case("src/testutils/blob_640641.txt", "src/testutils/blob_640641_output.txt")]
+    #[case("src/testutils/blob_640644.txt", "src/testutils/blob_640644_output.txt")]
+    #[case("src/testutils/blob_640646.txt", "src/testutils/blob_640646_output.txt")]
+    #[case("src/testutils/blob_640647.txt", "src/testutils/blob_640647_output.txt")]
+    #[case("src/testutils/blob_639404.txt", "src/testutils/blob_639404_output.txt")]
     fn test_parse_file_to_blob_data(#[case] file_path: &str, #[case] expected_output_file_path: &str) {
         let result = parse_file_to_blob_data(file_path);
         let expected_output: Vec<BigUint> = fs::read_to_string(expected_output_file_path).expect("Failed to read file").lines().into_iter()
