@@ -98,6 +98,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/apoorvsadana"><img src="https://avatars.githubusercontent.com/u/95699312?v=4?s=100" width="100px;" alt="apoorvsadana"/><br /><sub><b>apoorvsadana</b></sub></a><br /><a href="https://github.com/AbdelStark/majin-blob/commits?author=apoorvsadana" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/MSghais"><img src="https://avatars.githubusercontent.com/u/59928086?v=4?s=100" width="100px;" alt="MSG"/><br /><sub><b>MSG</b></sub></a><br /><a href="https://github.com/AbdelStark/majin-blob/commits?author=MSghais" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Mohiiit"><img src="https://avatars.githubusercontent.com/u/48082542?v=4?s=100" width="100px;" alt="Mohit Dhattarwal"/><br /><sub><b>Mohit Dhattarwal</b></sub></a><br /><a href="https://github.com/AbdelStark/majin-blob/commits?author=Mohiiit" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/prashansatanwar"><img src="https://avatars.githubusercontent.com/u/53948644?v=4?s=100" width="100px;" alt="Prashansa Tanwar"/><br /><sub><b>Prashansa Tanwar</b></sub></a><br /><a href="https://github.com/AbdelStark/majin-blob/commits?author=prashansatanwar" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
