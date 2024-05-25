@@ -83,3 +83,29 @@ curl -X POST --data-binary "@./examples/blob/sn_blob_goerli.txt" http://127.0.0.
 ## License
 
 This project is licensed under the [MIT license](LICENSE).
+
+## Contributors ✨
+
+Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/AbdelStark"><img src="https://avatars.githubusercontent.com/u/45264458?v=4?s=100" width="100px;" alt="Abdel @ StarkWare "/><br /><sub><b>Abdel @ StarkWare </b></sub></a><br /><a href="https://github.com/AbdelStark/majin-blob/commits?author=AbdelStark" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/apoorvsadana"><img src="https://avatars.githubusercontent.com/u/95699312?v=4?s=100" width="100px;" alt="apoorvsadana"/><br /><sub><b>apoorvsadana</b></sub></a><br /><a href="https://github.com/AbdelStark/majin-blob/commits?author=apoorvsadana" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/MSghais"><img src="https://avatars.githubusercontent.com/u/59928086?v=4?s=100" width="100px;" alt="MSG"/><br /><sub><b>MSG</b></sub></a><br /><a href="https://github.com/AbdelStark/majin-blob/commits?author=MSghais" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Mohiiit"><img src="https://avatars.githubusercontent.com/u/48082542?v=4?s=100" width="100px;" alt="Mohit Dhattarwal"/><br /><sub><b>Mohit Dhattarwal</b></sub></a><br /><a href="https://github.com/AbdelStark/majin-blob/commits?author=Mohiiit" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/prashansatanwar"><img src="https://avatars.githubusercontent.com/u/53948644?v=4?s=100" width="100px;" alt="Prashansa Tanwar"/><br /><sub><b>Prashansa Tanwar</b></sub></a><br /><a href="https://github.com/AbdelStark/majin-blob/commits?author=prashansatanwar" title="Code">💻</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!

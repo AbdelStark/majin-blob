@@ -30,16 +30,17 @@ pub fn parse_state_diffs(data: &[BigUint]) -> DataJson {
             break;
         }
         let info_word = &data[i];
-        i += 1;
 
         let (class_flag, nonce, number_of_storage_updates) = extract_bits(&info_word);
-
+        
         let new_class_hash = if class_flag {
             i += 1;
             Some(data[i].clone())
         } else {
             None
         };
+
+        i += 1;
 
         let mut storage_updates = Vec::new();
         for _ in 0..number_of_storage_updates {
@@ -163,3 +164,179 @@ fn extract_bits(info_word: &BigUint) -> (bool, u64, u64) {
 
     (class_flag, new_nonce, num_changes)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    
+    use std::fs;
+    use num_bigint::BigUint;
+    use std::{result, str::FromStr};
+    use rstest::rstest;
+    use crate::state_diffs::{ClassDeclaration, ContractUpdate, DataJson, StorageUpdate};
+
+    #[rstest]
+    #[case("18446744073709551617",false, 1, 1)] // hex: 10000000000000001
+    #[case("18446744073709551616",false, 1, 0)] // hex: 10000000000000000
+    #[case("6",false, 0, 6)] 
+    #[case("340282366920938463481821351505477763072", true, 1, 0)] // hex: 100000000000000010000000000000000
+    #[case("0", false, 0, 0)]
+    #[case("340282366920938463463374607431768211455", false, u64::MAX, u64::MAX)] // hex: FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+    #[case("680564733841876926926749214863536422911", true, u64::MAX, u64::MAX)] // hex: 1FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+    #[case("340282366920938486226656794389354915599", true, 1234, 9999)] // hex: 100000000000004D2000000000000270F
+    fn test_extract_bits(
+        #[case] info_word: BigUint,
+        #[case] expected_class_flag: bool,
+        #[case] expected_nonce: u64,
+        #[case] expected_num_changes: u64
+    ) {
+        let (class_flag, nonce, num_changes) = extract_bits(&info_word);
+        assert_eq!(class_flag, expected_class_flag);
+        assert_eq!(nonce, expected_nonce);
+        assert_eq!(num_changes, expected_num_changes);
+    }
+    
+    // Function to convert values in a string Array to BigUint Array
+    fn biguints_from_strings(values: &[&str]) -> Vec<BigUint> {
+        values.iter().map(|&v| BigUint::from_str(v).unwrap()).collect()
+    } 
+
+    #[rstest]
+    // Single Contract Update with One Class Declaration
+    #[case( 
+        &biguints_from_strings(&[
+            "2", "1", "1", "1", "1", "1234", "1", "12", "34", "1", "56", "78"
+        ]),  DataJson {
+            state_update_size: 1, 
+            state_update: vec![ContractUpdate {address: BigUint::from(1234u64), nonce: 0, number_of_storage_updates: 1, new_class_hash: None, storage_updates: vec![StorageUpdate{key: BigUint::from(12u64), value: BigUint::from(34u64)}]}],
+            class_declaration_size: 1, 
+            class_declaration: vec![ClassDeclaration {class_hash:BigUint::from(56u64),compiled_class_hash:BigUint::from(78u64)}]
+        }
+    )]
+    // Single Contract Update with One Storage Update and no 
+    #[case( 
+        &biguints_from_strings(&[
+            "2", "1", "1", "1", "1", "1234", "1", "12", "34", "0"
+        ]),  DataJson {
+            state_update_size: 1, 
+            state_update: vec![ContractUpdate {address: BigUint::from(1234u64), nonce: 0, number_of_storage_updates: 1, new_class_hash: None, storage_updates: vec![StorageUpdate{key: BigUint::from(12u64), value: BigUint::from(34u64)}]}],
+            class_declaration_size: 0, 
+            class_declaration: vec![]
+        }
+    )]
+    // Single Contract Update with New Class Hash and No Storage Updates
+    #[case( 
+        &biguints_from_strings(&[
+            "2", "1", "1", "1", "1", "1234", "340282366920938463481821351505477763072", "5432", "0"
+        ]),  DataJson {
+            state_update_size: 1, 
+            state_update: vec![ContractUpdate {address: BigUint::from(1234u64), nonce: 1, number_of_storage_updates: 0, new_class_hash: Some(BigUint::from(5432u64)), storage_updates: vec![]}],
+            class_declaration_size: 0, 
+            class_declaration: vec![]
+        }
+    )]
+    // Single Contract Update with New Class Hash and One Storage Update
+    #[case( 
+        &biguints_from_strings(&[
+            "2", "1", "1", "1", "1", "1234", "340282366920938568203987457954602287105", "5432", "12", "34", "0"
+        ]),  DataJson {
+            state_update_size: 1, 
+            state_update: vec![ContractUpdate {address: BigUint::from(1234u64), nonce: 5678, number_of_storage_updates: 1, new_class_hash: Some(BigUint::from(5432u64)), storage_updates: vec![StorageUpdate{key: BigUint::from(12u64), value: BigUint::from(34u64)}]}],
+            class_declaration_size: 0, 
+            class_declaration: vec![]
+        }
+    )]
+    // Single Contract Update with New Class Hash and Two Storage Updates
+    #[case( 
+        &biguints_from_strings(&[
+            "2", "1", "1", "1", "1", "1234", "340282366920938568203987457954602287106", "5432", "12", "34", "56", "78", "0"
+        ]),  DataJson {
+            state_update_size: 1, 
+            state_update: vec![ContractUpdate {address: BigUint::from(1234u64), nonce: 5678, number_of_storage_updates: 2, new_class_hash: Some(BigUint::from(5432u64)), storage_updates: vec![StorageUpdate{key: BigUint::from(12u64), value: BigUint::from(34u64)}, StorageUpdate{key: BigUint::from(56u64), value: BigUint::from(78u64)}]}],
+            class_declaration_size: 0, 
+            class_declaration: vec![]
+        }
+    )]
+    // No Contract Updates or Class Declarations
+    #[case( 
+        &biguints_from_strings(&[
+            "1", "1", "1", "1", "1", "0"
+        ]),  DataJson {
+            state_update_size: 0, 
+            state_update: vec![],
+            class_declaration_size: 0, 
+            class_declaration: vec![]
+        }
+    )]
+    // Multiple Class Declarations with No Contract Updates
+    #[case( 
+        &biguints_from_strings(&[
+            "1", "1", "1", "1", "1", "2", "34","12", "23", "56"
+        ]),  DataJson {
+            state_update_size: 0, 
+            state_update: vec![],
+            class_declaration_size: 2, 
+            class_declaration: vec![ClassDeclaration {class_hash:BigUint::from(34u64),compiled_class_hash:BigUint::from(12u64)}, ClassDeclaration {class_hash:BigUint::from(23u64),compiled_class_hash:BigUint::from(56u64)}]
+        }
+    )]
+
+    fn test_parse_state_diffs(#[case] data: &[BigUint], #[case] expected_result: DataJson) {
+        let result = parse_state_diffs(data);
+        assert_eq!(result, expected_result);
+    }
+
+    #[rstest]
+    #[case(
+        &"0000000000000000000000000000000100000000000000010000000000000000".repeat(4096), 
+        &biguints_from_strings(&[
+            "340282366920938463481821351505477763072"; 4096
+        ])
+
+    )]
+    #[case(
+        &"00000000000000000000000000000001FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF".repeat(4096), 
+        &biguints_from_strings(&[
+            "680564733841876926926749214863536422911"; 4096
+        ])
+
+    )]
+    #[case(
+        &"0000000000000000000000000000000100000000000004D2000000000000270F".repeat(4096), 
+        &biguints_from_strings(&[
+            "340282366920938486226656794389354915599"; 4096
+        ])
+
+    )]
+    #[case(
+        &"0000000000000D99634EE36951FE43500B1805B3CF342D12FA160E18DAB27208".repeat(4096), 
+        &biguints_from_strings(&[
+            "21853026169818237947070859940682658839820493093261147223781896"; 4096
+        ])
+
+    )]
+    #[case(
+        &"341606E915B8FCA7D6908382709FF17BB8CEF91ADDDAF43467903D7A0F1759DC6D676B911577A1AA3E35042EFB29BA0F1A618ADB1273BE72A61A71604E895F83".repeat(4096/2), 
+        &biguints_from_strings(&[
+            "23559186456188288176746211509925988380451132083205062504931431952989141031388", "49484828141560354917085179895740570325324754012313231526408991898487008878467"
+        ].repeat(4096/2))
+
+    )]
+    fn test_parse_str_to_blob_data(#[case] data: &str, #[case] expected_result: &Vec<BigUint>) {
+        let result = parse_str_to_blob_data(data);
+        assert_eq!(result, expected_result.clone());
+    }
+
+    #[rstest]
+    #[case("src/testutils/blob_640641.txt", "src/testutils/blob_640641_output.txt")]
+    #[case("src/testutils/blob_640644.txt", "src/testutils/blob_640644_output.txt")]
+    #[case("src/testutils/blob_640646.txt", "src/testutils/blob_640646_output.txt")]
+    #[case("src/testutils/blob_640647.txt", "src/testutils/blob_640647_output.txt")]
+    #[case("src/testutils/blob_639404.txt", "src/testutils/blob_639404_output.txt")]
+    fn test_parse_file_to_blob_data(#[case] file_path: &str, #[case] expected_output_file_path: &str) {
+        let result = parse_file_to_blob_data(file_path);
+        let expected_output: Vec<BigUint> = fs::read_to_string(expected_output_file_path).expect("Failed to read file").lines().into_iter()
+                                                .map(|s| BigUint::from_str(&s).expect("Failed to parse BigUint"))
+                                                .collect();
+        assert_eq!(result,expected_output);
+    }
+} 
