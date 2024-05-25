@@ -31,7 +31,7 @@ pub struct StorageUpdate {
     pub value: BigUint,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone,PartialEq, Eq, Hash)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ClassDeclaration {
     #[serde(serialize_with = "serialize_biguint")]
     pub class_hash: BigUint,
@@ -101,27 +101,25 @@ impl PartialEq for ContractUpdate {
     }
 }
 
-impl DataJson {
-    pub fn has_same_contract_updates(&self, other: &DataJson) -> bool {
-        let mut self_updates = self.state_update.clone();
-        let mut other_updates = other.state_update.clone();
+pub fn has_same_contract_updates(a: &DataJson, b: &DataJson) -> bool {
+    let mut self_updates = a.state_update.clone();
+    let mut other_updates = b.state_update.clone();
 
-        // Sort the updates by the unique identifier (address)
-        self_updates.sort_by_key(|update| update.sort_key());
-        other_updates.sort_by_key(|update| update.sort_key());
+    // Sort the updates by the unique identifier (address)
+    self_updates.sort_by_key(|update| update.sort_key());
+    other_updates.sort_by_key(|update| update.sort_key());
 
-        if self_updates.len() != other_updates.len() {
+    if self_updates.len() != other_updates.len() {
+        return false;
+    }
+
+    for (update_self, update_other) in self_updates.iter().zip(other_updates.iter()) {
+        if update_self != update_other {
             return false;
         }
-
-        for (update_self, update_other) in self_updates.iter().zip(other_updates.iter()) {
-            if update_self != update_other {
-                return false;
-            }
-        }
-
-        true
     }
+
+    true
 }
 
 pub fn have_identical_class_declarations(a: &DataJson, b: &DataJson) -> bool {
