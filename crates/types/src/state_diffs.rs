@@ -1,7 +1,8 @@
 use num_bigint::BigUint;
 use serde::{Deserialize, Serialize, Serializer};
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 pub struct DataJson {
     pub state_update_size: u64,
     pub state_update: Vec<ContractUpdate>,
@@ -10,7 +11,7 @@ pub struct DataJson {
 }
 
 // Define the data structures
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 pub struct ContractUpdate {
     #[serde(serialize_with = "serialize_biguint")]
     pub address: BigUint,
@@ -21,7 +22,7 @@ pub struct ContractUpdate {
     pub storage_updates: Vec<StorageUpdate>,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq, Hash)]
 pub struct StorageUpdate {
     #[serde(serialize_with = "serialize_biguint")]
     pub key: BigUint,
@@ -29,7 +30,7 @@ pub struct StorageUpdate {
     pub value: BigUint,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq, Hash)]
 pub struct ClassDeclaration {
     #[serde(serialize_with = "serialize_biguint")]
     pub class_hash: BigUint,

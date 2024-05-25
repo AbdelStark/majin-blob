@@ -30,6 +30,7 @@ pub fn parse_state_diffs(data: &[BigUint]) -> DataJson {
             break;
         }
         let info_word = &data[i];
+
         
         let (class_flag, nonce, number_of_storage_updates) = extract_bits(&info_word);
         
@@ -39,6 +40,7 @@ pub fn parse_state_diffs(data: &[BigUint]) -> DataJson {
         } else {
             None
         };
+
         i += 1;
 
         let mut storage_updates = Vec::new();
