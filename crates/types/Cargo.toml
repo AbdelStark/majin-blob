@@ -18,3 +18,4 @@ num-bigint = { workspace = true, default-features = false, features = [
 num-traits = { workspace = true, default-features = false }
 serde_json = { workspace = true, default-features = false }
 serde = { workspace = true, default-features = false, features = ["derive"] }
+rstest = "0.19.0"
