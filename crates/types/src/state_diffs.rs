@@ -68,7 +68,9 @@ pub trait UnorderedEq {
 // Implement UnorderedEq for DataJson
 impl UnorderedEq for DataJson {
     fn unordered_eq(&self, other: &Self) -> bool {
-        self.state_update.unordered_eq(&other.state_update)
+        self.state_update_size == other.state_update_size
+            && self.class_declaration_size == other.class_declaration_size
+            && self.state_update.unordered_eq(&other.state_update)
             && self
                 .class_declaration
                 .unordered_eq(&other.class_declaration)
