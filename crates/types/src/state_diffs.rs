@@ -141,10 +141,3 @@ impl UnorderedEq for ContractUpdate {
             && self.storage_updates.unordered_eq(&other.storage_updates)
     }
 }
-
-// Implement UnorderedEq for ClassDeclaration
-impl UnorderedEq for ClassDeclaration {
-    fn unordered_eq(&self, other: &Self) -> bool {
-        self.class_hash == other.class_hash && self.compiled_class_hash == other.compiled_class_hash
-    }
-}
