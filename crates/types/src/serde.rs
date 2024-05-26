@@ -31,7 +31,6 @@ pub fn parse_state_diffs(data: &[BigUint]) -> DataJson {
         }
         let info_word = &data[i];
 
-        
         let (class_flag, nonce, number_of_storage_updates) = extract_bits(&info_word);
         
         let new_class_hash = if class_flag {
